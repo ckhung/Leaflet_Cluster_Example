@@ -1,20 +1,21 @@
+/* jshint esversion: 6 */
 // See post: http://asmaloney.com/2015/06/code/clustering-markers-on-leaflet-maps
 
 var map = L.map('map', {
-  center: [10.0, 5.0],
-  minZoom: 2,
+  center: [24.1944, 120.6625],
+  minZoom: 11,
   zoom: 2,
-})
+});
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   subdomains: ['a', 'b', 'c'],
-}).addTo(map)
+}).addTo(map);
 
 var myURL = jQuery('script[src$="leaf-demo.js"]')
   .attr('src')
-  .replace('leaf-demo.js', '')
+  .replace('leaf-demo.js', '');
 
 var myIcon = L.icon({
   iconUrl: myURL + 'images/pin24.png',
@@ -22,30 +23,30 @@ var myIcon = L.icon({
   iconSize: [29, 24],
   iconAnchor: [9, 21],
   popupAnchor: [0, -14],
-})
+});
 
-var markerClusters = L.markerClusterGroup()
+var markerClusters = L.markerClusterGroup();
 
 for (var i = 0; i < markers.length; ++i) {
-  var popup =
-    markers[i].name +
-    '<br/>' +
-    markers[i].city +
-    '<br/><b>IATA/FAA:</b> ' +
-    markers[i].iata_faa +
-    '<br/><b>ICAO:</b> ' +
-    markers[i].icao +
-    '<br/><b>Altitude:</b> ' +
-    Math.round(markers[i].alt * 0.3048) +
-    ' m' +
-    '<br/><b>Timezone:</b> ' +
-    markers[i].tz
+  var name = '',
+      popup = '',
+      prop = markers[i].properties;
+  var keys = Object.keys(prop);
+  for (const k of keys) {
+      var tmp = k + ': ' + prop[k] + '<br />';
+      if (k.match(/^\d*name\w*$/)) {
+	  name += tmp;
+      } else {
+	  popup += tmp;
+      }
+  }
 
-  var m = L.marker([markers[i].lat, markers[i].lng], {
+  var coord = markers[i].geometry.coordinates;
+  var m = L.marker([coord[1], coord[0]], {
     icon: myIcon,
-  }).bindPopup(popup)
+  }).bindPopup(name+popup);
 
-  markerClusters.addLayer(m)
+  markerClusters.addLayer(m);
 }
 
-map.addLayer(markerClusters)
+map.addLayer(markerClusters);
